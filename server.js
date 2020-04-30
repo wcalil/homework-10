@@ -17,7 +17,12 @@ app.get('/notes', (req, res) => {
 })
 
 app.get('/api/notes', function (req, res) {
-  res.sendFile(__dirname + '/db/db.json')
+  fs.readFile(__dirname + '/db/db.json', (err, data)=>{
+    if ( err) {console.log(err)}
+    let notesData = JSON.parse(data)
+    notesData.forEach((note, i)=>note.id = i)
+    res.json(notesData)
+  })
 })
 
 app.post('/api/notes', function (req, res) {
@@ -40,18 +45,32 @@ app.post('/api/notes', function (req, res) {
 
 
 app.delete('/api/notes/:id', function (req, res) {
+  
   const deleteNotes = req.params.id;
   console.log(deleteNotes)
-  // const found = db.find(element => deleteNotes)
-  // console.log(found)
-  // deleteNotesObject = JSON.parse(deleteNotes)
-  // const result = db.find( ({ title }) => title === deleteNotesObject.title );
-  // console.log(result)
+
+  fs.readFile(__dirname + '/db/db.json', (err, data)=>{
+    if ( err) {console.log(err)}
+    let notesData = JSON.parse(data)
+    notesData.splice(deleteNotes, 1)
+    fs.writeFile(__dirname + '/db/db.json', JSON.stringify(notesData), err=>{
+      if (err) { console.log(err)}
+      res.sendStatus(200)
+    })
+  })
+
+//   const found = db.find(element => deleteNotes)
+//   console.log(found)
+
+//   deleteNotesObject = JSON.parse(deleteNotes)
+
+//   const result = db.find( ({ title }) => title === deleteNotesObject.title );
+//   console.log(result)
 
 //   for (i = 0; i < db.length ; i++){
 // if(db.title[i] === ) {}
 
-//   }
+  // }
 
 
 })
